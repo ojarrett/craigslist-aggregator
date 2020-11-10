@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
@@ -10,8 +10,8 @@ class Posting(Base):
     rooms = Column(String)
     posting_id = Column(Integer)
     url = Column(String)
-    price = Column(String)
-    last_updated = Column(Integer)
+    price = Column(Float)
+    last_updated = Column(String)
 
     def __repr__(self):
         return "<Posting(rooms='{0}', posting_id={1}, url='{2}', price={3})>".format(

@@ -14,7 +14,8 @@ class DbSync:
         title = posting['title']
         
         new_posting = Posting(rooms=rooms, posting_id=posting_id,
-                url=url, price=price, last_updated=last_updated)
+                url=url, price=price, last_updated=last_updated,
+                title=title)
 
         session = self.db_ops_handler.get_session()
         session.add(new_posting)

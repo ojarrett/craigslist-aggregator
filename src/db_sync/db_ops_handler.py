@@ -21,7 +21,7 @@ class DbOpsHandler:
 
     def get_session(self):
         if self.session:
-            return session
+            return self.session
         else:
             if not self.engine:
                 self.create_engine()
