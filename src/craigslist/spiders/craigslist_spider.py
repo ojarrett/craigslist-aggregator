@@ -1,6 +1,8 @@
 import scrapy
 from time import sleep
 import random
+import re
+from posting.craigslist_utils import parse_price, parse_rooms
 
 class CraigslistSpider(scrapy.Spider):
     name = "craigslist"
@@ -15,8 +17,9 @@ class CraigslistSpider(scrapy.Spider):
     def parse(self, response):
         for result in response.css('li.result-row'):
             title = result.css('a.result-title::text').get()
-            price = result.css('span.result-price::text').get()
-            rooms = result.css('span.housing::text').get()
+            price = parse_price(result.css('span.result-price::text').get())
+            rooms = parse_rooms(result.css('span.housing::text').get())
+
             url = result.css('a.result-title::attr(href)').get()
             posting_id = result.attrib['data-pid']
 
