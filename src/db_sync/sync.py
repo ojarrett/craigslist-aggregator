@@ -11,6 +11,7 @@ class DbSync:
         url = posting['url']
         price = posting['price']
         last_updated = posting['last_updated']
+        title = posting['title']
         
         new_posting = Posting(rooms=rooms, posting_id=posting_id,
                 url=url, price=price, last_updated=last_updated)

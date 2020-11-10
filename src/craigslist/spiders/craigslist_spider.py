@@ -1,5 +1,6 @@
 import scrapy
-from bs4 import BeautifulSoup
+from time import sleep
+import random
 
 class CraigslistSpider(scrapy.Spider):
     name = "craigslist"
@@ -12,9 +13,23 @@ class CraigslistSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        filename = 'sublets.html'
-        with open(filename, 'w') as f:
-            soup = BeautifulSoup(response.body, 'html.parser')
-            for title in soup.find_all('a', class_='result-title'):
-                f.write(title.get_text())
-        self.log(f'Saved file {filename}')
+        for result in response.css('li.result-row'):
+            title = result.css('a.result-title::text').get()
+            price = result.css('span.result-price::text').get()
+            rooms = result.css('span.housing::text').get()
+            url = result.css('a.result-title::attr(href)').get()
+            posting_id = result.attrib['data-pid']
+
+            if title and price and rooms and url and posting_id:
+                yield {
+                    'title': title, 
+                    'price': price, 
+                    'rooms': rooms, 
+                    'url': url,
+                    'posting_id': posting_id,
+                }
+
+        next_page = response.css('a.next::attr(href)').get()
+        if next_page is not None:
+            sleep(random.random()*10.0 + 2.0)
+            yield response.follow(next_page, callback=self.parse)

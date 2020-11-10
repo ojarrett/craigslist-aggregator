@@ -6,6 +6,7 @@ class Posting(Base):
     __tablename__ = "postings"
 
     id = Column(Integer, primary_key=True)
+    title = Column(String)
     rooms = Column(String)
     posting_id = Column(Integer)
     url = Column(String)
