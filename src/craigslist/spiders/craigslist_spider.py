@@ -2,7 +2,7 @@ import scrapy
 from time import sleep
 import random
 import re
-from posting.craigslist_utils import parse_price, parse_rooms
+from posting.craigslist_utils import parse_price, parse_rooms, get_region_from_url
 from db_sync.sync import DbSync
 
 class CraigslistSpider(scrapy.Spider):
@@ -10,11 +10,14 @@ class CraigslistSpider(scrapy.Spider):
 
     def start_requests(self):
         self.db_sync = DbSync()
-        urls = [
-            'https://minneapolis.craigslist.org/d/sublets-temporary/search/sub',
-        ]
+
+        urls = []
+        with open('base_sites.cfg', 'r') as f:
+            urls = [site + "/d/sublets-temporary/search/sub" for site in f]
+
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
+            sleep(random.random()*3.0 + 3.0)
 
     def parse(self, response):
         for result in response.css('li.result-row'):
@@ -23,6 +26,7 @@ class CraigslistSpider(scrapy.Spider):
             rooms = parse_rooms(result.css('span.housing::text').get())
 
             url = result.css('a.result-title::attr(href)').get()
+            region = get_region_from_url(url)
             posting_id = result.attrib['data-pid']
             last_updated = result.css('time.result-date::attr(datetime)').get()
 
@@ -33,7 +37,8 @@ class CraigslistSpider(scrapy.Spider):
                     'rooms': rooms, 
                     'url': url,
                     'posting_id': posting_id,
-                    'last_updated': last_updated
+                    'last_updated': last_updated,
+                    'region': region,
                 }
 
                 self.db_sync.add_posting(new_posting)

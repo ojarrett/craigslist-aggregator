@@ -11,3 +11,6 @@ def parse_rooms(rooms_field):
             return int(rooms)
 
     return -1
+
+def get_region_from_url(url):
+    return re.search(r"([a-z]+)\.craigslist.org",url).group(1)

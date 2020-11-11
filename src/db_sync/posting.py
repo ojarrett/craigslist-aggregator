@@ -12,6 +12,7 @@ class Posting(Base):
     url = Column(String)
     price = Column(Float)
     last_updated = Column(String)
+    region = Column(String)
 
     def __repr__(self):
         return "<Posting(rooms='{0}', posting_id={1}, url='{2}', price={3})>".format(
