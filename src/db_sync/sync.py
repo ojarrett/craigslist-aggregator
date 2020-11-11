@@ -21,4 +21,21 @@ class DbSync:
         session = self.db_ops_handler.get_session()
         session.add(new_posting)
         session.commit()
-        
+
+    def get_posting(self, posting_id, region):
+        session = self.db_ops_handler.get_session()
+        posting = session.query(Posting).filter(Posting.region == region).filter(Posting.posting_id == posting_id).first()
+
+        if posting:
+            return {
+                    'rooms': posting.rooms,
+                    'url': posting.url,
+                    'price': posting.price,
+                    'last_updated': posting.last_updated,
+                    'posting_id': posting_id,
+                    'region': region,
+                    'title': posting.title,
+            }
+
+        return None
+
