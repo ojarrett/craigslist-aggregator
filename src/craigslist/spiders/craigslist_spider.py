@@ -41,7 +41,10 @@ class CraigslistSpider(scrapy.Spider):
                     'region': region,
                 }
 
-                self.db_sync.add_posting(new_posting)
+                old_posting = self.db_sync.get_posting(posting_id=posting_id, region=region)
+
+                if old_posting is None:
+                    self.db_sync.add_posting(new_posting)
                 yield new_posting
 
         next_page = response.css('a.next::attr(href)').get()
