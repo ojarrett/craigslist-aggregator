@@ -17,6 +17,14 @@ class DbOpsHandler:
 
             self.sessionmaker = sessionmaker(bind=self.engine)
 
+    # Mainly used for unit tests
+    def clean_tables(self):
+        if self.engine is None:
+            self.create_engine()
+
+        Base.metadata.drop_all(self.engine)
+        Base.metadata.create_all(self.engine)
+
     def get_session(self):
         if self.session:
             return self.session

@@ -29,6 +29,7 @@ class CraigslistSpider(scrapy.Spider):
             region = get_region_from_url(url)
             posting_id = result.attrib['data-pid']
             last_updated = result.css('time.result-date::attr(datetime)').get()
+            repost_of = result.attrib['data-repost-of'] if 'data-repost-of' in result.attrib else None
 
             if title and price and rooms and url and posting_id and last_updated:
                 new_posting = {
@@ -41,7 +42,10 @@ class CraigslistSpider(scrapy.Spider):
                     'region': region,
                 }
 
-                old_posting = self.db_sync.get_posting(posting_id=posting_id, region=region)
+                if repost_of:
+                    new_posting['repost_of'] = repost_of
+
+                old_posting = self.db_sync.get_posting(posting_id=posting_id, region=region, repost_of=repost_of)
 
                 if old_posting is None:
                     self.db_sync.add_posting(new_posting)
