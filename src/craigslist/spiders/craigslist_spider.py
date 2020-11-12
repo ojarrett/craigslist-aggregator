@@ -45,9 +45,15 @@ class CraigslistSpider(scrapy.Spider):
 
                 if old_posting is None:
                     self.db_sync.add_posting(new_posting)
-                yield new_posting
+                else:
+                    # If we encounter the same posting with the same update time, the
+                    # local posting DB is likely up to date and we don't need to sync
+                    # any results after this point.
+                    if old_posting['last_updated'] == new_posting['last_updated']:
+                        stop_crawling = True
 
-        next_page = response.css('a.next::attr(href)').get()
-        if next_page is not None:
-            sleep(random.random()*10.0 + 2.0)
-            yield response.follow(next_page, callback=self.parse)
+        if not stop_crawling:
+            next_page = response.css('a.next::attr(href)').get()
+            if next_page is not None:
+                sleep(random.random()*10.0 + 2.0)
+                yield response.follow(next_page, callback=self.parse)
